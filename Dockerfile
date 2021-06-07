@@ -54,10 +54,9 @@ RUN make && \
     make clean
 
 # # add the generic IOC source and add_module.sh
-# COPY --chown=${USER_UID}:${USER_GID} ioc ioc
+COPY --chown=${USER_UID}:${USER_GID} ioc ${EPICS_ROOT}/ioc
 
-# # make generic IOC (separate step for efficient image layering)
-# RUN echo 'IOC=$(SUPPORT)/ioc' >> configure/RELEASE && \
-#     make release && \
-#     make && \
-#     make clean
+# make generic IOC (separate step for efficient image layering)
+RUN echo IOC=${EPICS_ROOT}/ioc >> configure/RELEASE && \
+    make -C ${EPICS_ROOT}/ioc && \
+    make -C ${EPICS_ROOT}/ioc clean
