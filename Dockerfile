@@ -53,7 +53,7 @@ RUN ./patch_modules.sh && \
 RUN make && \
     make clean
 
-# # add the generic IOC source and add_module.sh
+# # add the generic IOC
 COPY --chown=${USER_UID}:${USER_GID} ioc ${EPICS_ROOT}/ioc
 
 # make generic IOC (separate step for efficient image layering)
