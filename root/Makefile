@@ -1,6 +1,9 @@
- #Makefile at top of application tree
- TOP = .
- include $(TOP)/configure/CONFIG
- DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *))
+TOPTARGETS := all clean
 
- include $(TOP)/configure/RULES_TOP
+include configure/MODULES
+
+$(TOPTARGETS): $(MODULES)
+$(MODULES):
+	$(MAKE) -C $@ $(MAKECMDGOALS)
+
+.PHONY: $(TOPTARGETS) $(MODULES)

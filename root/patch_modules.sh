@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Patch StreamDevice
+# (see https://raw.githubusercontent.com/EPICS-synApps/support/R6-2/assemble_synApps.sh)
+rm StreamDevice*/GNUmakefile
+sed -i 's/PCRE=/#PCRE=/g' StreamDevice*/configure/RELEASE
+echo "SSCAN=" >> StreamDevice*/configure/RELEASE
+echo "STREAM=" >> StreamDevice*/configure/RELEASE
+sed -i 's/#PROD_LIBS += sscan/PROD_LIBS += sscan/g'  StreamDevice*/streamApp/Makefile
+

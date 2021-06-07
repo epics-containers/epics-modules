@@ -1,6 +1,0 @@
-# The following definitions must be changed for each site
-
-
-#     - To build the IOC applications set BUILD_IOCS to YES
-#       Otherwise set it to NO
-BUILD_IOCS=NO

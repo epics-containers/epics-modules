@@ -24,7 +24,6 @@ ENV SUPPORT ${EPICS_ROOT}/support
 WORKDIR ${SUPPORT}
 
 COPY --chown=${USER_UID}:${USER_GID} root/* ${SUPPORT}/
-COPY --chown=${USER_UID}:${USER_GID} configure ${SUPPORT}/configure
 RUN chown ${USERNAME} ${SUPPORT}
 
 USER ${USERNAME}
@@ -33,17 +32,22 @@ RUN pip install -r requirements.txt
 
 # get the build script and remove apps in ${SKIP_APPS}
 RUN git config --global advice.detachedHead false && \
-    python3 module.py init && \
-    python3 module.py add epics-modules alive ALIVE R1-3-1 && \
+    python3 module.py init
+
+# get basic support modules in order of depenencies
+RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer/releases/seq-{TAG}.tar.gz seq SNCSEQ 2.2.8 && \
+    python3 module.py add epics-modules sscan SSCAN R2-11-4 && \
+    python3 module.py add epics-modules calc CALC R3-7-4 && \
     python3 module.py add epics-modules asyn ASYN R4-41 && \
+    python3 module.py add epics-modules alive ALIVE R1-3-1 && \
     python3 module.py add epics-modules autosave AUTOSAVE  R5-10-2 && \
     python3 module.py add epics-modules busy BUSY R1-7-3 && \
-    python3 module.py add epics-modules calc CALC R3-7-4 && \
     python3 module.py add epics-modules iocStats DEVIOCSTATS 3.1.16 && \
     python3 module.py add epics-modules std STD R3-6-2 && \
-    python3 module.py add paulscherrerinstitute StreamDevice STREAM 2.8.16 && \
-    python3 module.py dependencies
+    python3 module.py add paulscherrerinstitute StreamDevice STREAM 2.8.16
 
+RUN ./patch_modules.sh && \
+    python3 module.py dependencies
 
 # compile all synapps modules
 RUN make && \
