@@ -4,8 +4,6 @@ ARG EPICS_VERSION=7.0.5b2.0
 
 FROM ${REGISTRY}/epics/epics-base:${EPICS_VERSION}
 
-ARG VERSION=R0-1
-
 # install additional tools
 USER root
 
@@ -46,6 +44,7 @@ RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer
     python3 module.py add epics-modules std STD R3-6-2 && \
     python3 module.py add paulscherrerinstitute StreamDevice STREAM 2.8.16
 
+# patch modules that require it and update all configure RELEASE files
 RUN ./patch_modules.sh && \
     python3 module.py dependencies
 
@@ -53,7 +52,7 @@ RUN ./patch_modules.sh && \
 RUN make && \
     make clean
 
-# # add the generic IOC
+# add the generic IOC source code
 COPY --chown=${USER_UID}:${USER_GID} ioc ${EPICS_ROOT}/ioc
 
 # make generic IOC (separate step for efficient image layering)
