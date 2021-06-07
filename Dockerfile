@@ -30,11 +30,11 @@ USER ${USERNAME}
 RUN pip install -r requirements.txt
 
 
-# get the build script and remove apps in ${SKIP_APPS}
+# create the global configure/RELEASE which records version of modules
 RUN git config --global advice.detachedHead false && \
     python3 module.py init
 
-# get basic support modules in order of depenencies
+# get basic support modules in order of dependencies
 RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer/releases/seq-{TAG}.tar.gz seq SNCSEQ 2.2.8 && \
     python3 module.py add epics-modules sscan SSCAN R2-11-4 && \
     python3 module.py add epics-modules calc CALC R3-7-4 && \
@@ -49,7 +49,7 @@ RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer
 RUN ./patch_modules.sh && \
     python3 module.py dependencies
 
-# compile all synapps modules
+# compile all modules
 RUN make && \
     make clean
 
