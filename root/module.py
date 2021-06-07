@@ -187,9 +187,12 @@ def dependencies():
 
     # generate the MODULES file for inclusion into the root Makefile
     # it simply defines a variable to hold each of the support module
-    # directories in the order they are presented in RELEASE
+    # directories in the order they are presented in RELEASE, except that
+    # the IOC is always listed last if present.
     s = "$(SUPPORT)/"
     modules = [module[len(s):] for module in versions.values() if module.startswith(s)]
+    if "IOC" in versions:
+        modules.append(versions["IOC"])
     modlist = f'MODULES := {" ".join(modules)}\n'
     MODULES.write_text(modlist)
 
