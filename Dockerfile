@@ -17,18 +17,15 @@ RUN apt-get update && apt-get upgrade -y && \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-
 ENV SUPPORT ${EPICS_ROOT}/support
 WORKDIR ${SUPPORT}
-
-COPY --chown=${USER_UID}:${USER_GID} root/* ${SUPPORT}/
-RUN chown ${USERNAME} ${SUPPORT}
+COPY --chown=${USER_UID}:${USER_GID} ./support/. ${SUPPORT}/
+RUN chown ${USERNAME} ${SUPPORT} && \
+    pip install -r requirements.txt
 
 USER ${USERNAME}
-RUN pip install -r requirements.txt
 
-
-# create the global configure/RELEASE which records version of modules
+# initialize the global support/configure/RELEASE
 RUN git config --global advice.detachedHead false && \
     python3 module.py init
 
@@ -44,18 +41,15 @@ RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer
     python3 module.py add epics-modules std STD R3-6-2 && \
     python3 module.py add paulscherrerinstitute StreamDevice STREAM 2.8.16
 
-# patch modules that require it and update all configure RELEASE files
-RUN ./patch_modules.sh && \
+# patch support modules and fixup all dependencies
+RUN echo IOC=${EPICS_ROOT}/ioc >> configure/RELEASE && \
+    ./patch_modules.sh && \
     python3 module.py dependencies
-
-# compile all modules
-RUN make && \
-    make clean
 
 # add the generic IOC source code
 COPY --chown=${USER_UID}:${USER_GID} ioc ${EPICS_ROOT}/ioc
 
-# make generic IOC (separate step for efficient image layering)
-RUN echo IOC=${EPICS_ROOT}/ioc >> configure/RELEASE && \
-    make -C ${EPICS_ROOT}/ioc && \
-    make -C ${EPICS_ROOT}/ioc clean
+# compile all support modules and the IOC
+RUN cat /epics/support/seq-2-2-8/configure/RELEASE && \
+    make && \
+    make clean

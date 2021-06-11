@@ -16,10 +16,16 @@ EPICS_ROOT = EPICS_BASE.parent
 SUPPORT = Path(f"{EPICS_ROOT}/support/")
 # the global RELEASE file which lists all support modules
 RELEASE = Path(f"{SUPPORT}/configure/RELEASE")
+# a bash script to export the macros defined in RELEASE as enviroment vars
+RELEASE_SH = Path(f"{SUPPORT}/configure/RELEASE.shell")
 # global MODULES file used to determine order of build
 MODULES = Path(f"{SUPPORT}/configure/MODULES")
 
+# find macro name and macro value in a RELEASE file
 PARSE_MACROS = re.compile(r"^([A-Z_a-z0-9]*)\s*=\s*(.*)$", flags=re.M)
+# turn RELEASE macros into bash macros
+SHELLIFY_FIND = re.compile(r"\$\(([^\)]*)\)")
+SHELLIFY_REPLACE = r"${\1}"
 
 
 @click.group(invoke_without_command=True)
@@ -182,19 +188,34 @@ def dependencies():
                 replace = re.compile(f"^({macro}*\\s*=[ \t]*)(.*)$", flags=re.M)
                 text = replace.sub(r"\1" + val, text)
             if orig_text != text:
-                print(f"updating {rel}")
+                print(f"updating dependencies in {rel}")
                 rel.write_text(text)
 
     # generate the MODULES file for inclusion into the root Makefile
     # it simply defines a variable to hold each of the support module
     # directories in the order they are presented in RELEASE, except that
-    # the IOC is always listed last if present.
+    # the IOC is always listed last, if present.
     s = "$(SUPPORT)/"
-    modules = [module[len(s):] for module in versions.values() if module.startswith(s)]
+    paths = [path[len(s):] for path in versions.values() if path.startswith(s)]
     if "IOC" in versions:
-        modules.append(versions["IOC"])
-    modlist = f'MODULES := {" ".join(modules)}\n'
+        paths.append(versions["IOC"])
+    modlist = f'MODULES := {" ".join(paths)}\n'
     MODULES.write_text(modlist)
+
+    # generate RELEASE.sh file for inclusion into the ioc launch shell script.
+    # This adds all module paths to the environment and also adds their db
+    # folders to the database search path env variable EPICS_DB_INCLUDE_PATH
+    release_sh = []
+    for module, path in versions.items():
+        release_sh.append(f'export {module}="{path}"')
+
+    db_paths = [f"{path}/db" for path in versions.values() if path.startswith(s)]
+    db_path_list = ":".join(db_paths)
+    release_sh.append(f'export EPICS_DB_INCLUDE_PATH="{db_path_list}"')
+
+    shell_text = "\n".join(release_sh) + "\n"
+    shell_text = SHELLIFY_FIND.sub(SHELLIFY_REPLACE, shell_text)
+    RELEASE_SH.write_text(shell_text)
 
 
 if __name__ == "__main__":
