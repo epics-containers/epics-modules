@@ -1,0 +1,40 @@
+name:  Build and publish image to ghcr.io/epics-containers
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Determine container image tag to use
+        id: tag
+        run: |
+          if [[ ${GITHUB_REF} = refs/tags/* ]] ; then
+            echo ::set-output name=image_tag::${GITHUB_REF#refs/tags/}
+            echo ::set-output name=do_push::true
+          else
+            echo ::set-output name=image_tag::"NONE"
+            echo ::set-output name=do_push::false
+          fi
+
+      - name: Log in to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io/epics-containers
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build container image
+        uses: docker/build-push-action@v2
+        with:
+          push: ${{ steps.tag.outputs.do_push }}
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ steps.tag.outputs.image_tag }}
+
