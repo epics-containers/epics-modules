@@ -8,3 +8,6 @@ echo "SSCAN=" >> StreamDevice*/configure/RELEASE
 echo "STREAM=" >> StreamDevice*/configure/RELEASE
 sed -i 's/#PROD_LIBS += sscan/PROD_LIBS += sscan/g'  StreamDevice*/streamApp/Makefile
 
+
+# Uncomment sseq support in calc
+sed -i s:'#SNCSEQ':'SNCSEQ':g calc*/configure/RELEASE

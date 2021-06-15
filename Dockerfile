@@ -1,4 +1,4 @@
-# EPICS SynApps Dockerfile
+# EPICS Dockerfile for Asyn and other fundamental support modules
 ARG REGISTRY=gcr.io/diamond-pubreg/controls/prod
 ARG EPICS_VERSION=7.0.5b2.0
 
@@ -17,8 +17,11 @@ RUN apt-get update && apt-get upgrade -y && \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
+# environment
 ENV SUPPORT ${EPICS_ROOT}/support
 WORKDIR ${SUPPORT}
+
+# setup module.py for managing support module dependencies
 COPY --chown=${USER_UID}:${USER_GID} ./support/. ${SUPPORT}/
 RUN chown ${USERNAME} ${SUPPORT} && \
     pip install -r requirements.txt
@@ -41,7 +44,7 @@ RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer
     python3 module.py add epics-modules std STD R3-6-2 && \
     python3 module.py add paulscherrerinstitute StreamDevice STREAM 2.8.16
 
-# patch support modules and fixup all dependencies
+# patch support modules and fix up all dependencies
 RUN echo IOC=${EPICS_ROOT}/ioc >> configure/RELEASE && \
     ./patch_modules.sh && \
     python3 module.py dependencies
@@ -49,7 +52,7 @@ RUN echo IOC=${EPICS_ROOT}/ioc >> configure/RELEASE && \
 # add the generic IOC source code
 COPY --chown=${USER_UID}:${USER_GID} ioc ${EPICS_ROOT}/ioc
 
-# compile all support modules and the IOC
+# compile the support modules and the IOC
 RUN cat /epics/support/seq-2-2-8/configure/RELEASE && \
     make && \
     make clean
