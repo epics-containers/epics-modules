@@ -1,8 +1,8 @@
 # EPICS Dockerfile for Asyn and other fundamental support modules
-ARG REGISTRY=gcr.io/diamond-pubreg/controls/prod
-ARG EPICS_VERSION=7.0.5b2.0
+ARG REGISTRY=ghcr.io/epics-containers
+ARG EPICS_VERSION=7.0.5r1.0
 
-FROM ${REGISTRY}/epics/epics-base:${EPICS_VERSION}
+FROM ${REGISTRY}/epics-base:${EPICS_VERSION}
 
 # install additional tools
 USER root
