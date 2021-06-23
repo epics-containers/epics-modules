@@ -1,6 +1,6 @@
 # EPICS Dockerfile for Asyn and other fundamental support modules
 ARG REGISTRY=ghcr.io/epics-containers
-ARG EPICS_VERSION=7.0.5r1.0
+ARG EPICS_VERSION=7.0.5r1.1
 
 FROM ${REGISTRY}/epics-base:${EPICS_VERSION}
 
@@ -55,4 +55,4 @@ COPY --chown=${USER_UID}:${USER_GID} ioc ${EPICS_ROOT}/ioc
 # compile the support modules and the IOC
 RUN cat /epics/support/seq-2-2-8/configure/RELEASE && \
     make && \
-    make clean
+    make -j clean
