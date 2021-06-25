@@ -1,6 +1,6 @@
 # EPICS Dockerfile for Asyn and other fundamental support modules
 ARG REGISTRY=ghcr.io/epics-containers
-ARG EPICS_VERSION=7.0.5r1.1
+ARG EPICS_VERSION=7.0.5r2.0
 
 FROM ${REGISTRY}/epics-base:${EPICS_VERSION}
 
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get upgrade -y && \
     libc-dev-bin \
     libusb-1.0-0-dev \
     python3-pip \
-    python3.8 \
+    python3.8-minimal \
     re2c \
     wget \
     && rm -rf /var/lib/apt/lists/*
@@ -29,8 +29,7 @@ RUN chown ${USERNAME} ${SUPPORT} && \
 USER ${USERNAME}
 
 # initialize the global support/configure/RELEASE
-RUN git config --global advice.detachedHead false && \
-    python3 module.py init
+RUN python3 module.py init
 
 # get basic support modules in order of dependencies
 RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer/releases/seq-{TAG}.tar.gz seq SNCSEQ 2.2.8 && \
