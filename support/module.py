@@ -5,6 +5,7 @@ Provide a basic CLI for managing a set of EPICS support modules
 import os
 import re
 import subprocess
+from shutil import rmtree
 from pathlib import Path
 
 import click
@@ -84,6 +85,9 @@ def add(
     if process.returncode != 0:
         raise RuntimeError(process.stdout)
 
+    # throw away git folder to keep image size tight
+    rmtree(Path(sub_folder) / ".git")
+
     with RELEASE.open("a") as stream:
         stream.write(f"{macro}=$(SUPPORT)/{module}-{dash_tag}\n")
 
@@ -135,6 +139,7 @@ def add_tar(
         raise RuntimeError(p.stdout)
 
     new_folder = Path(tar_file[0:tar_file.find(".tar")])
+    # throw away tar file to keep image size tight
     Path(tar_file).unlink()
     new_folder.rename(sub_folder)
 
