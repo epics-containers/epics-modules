@@ -1,11 +1,17 @@
 # EPICS Dockerfile for Asyn and other fundamental support modules
 ARG REGISTRY=ghcr.io/epics-containers
-ARG EPICS_VERSION=7.0.5r2.0
+ARG EPICS_VERSION=7.0.5r3.0
 
-FROM ${REGISTRY}/epics-base:${EPICS_VERSION}
+##### build stage ##############################################################
+
+FROM ${REGISTRY}/epics-base:${EPICS_VERSION} AS developer
 
 # install additional tools
 USER root
+
+# import support folder root files
+COPY --chown=${USER_UID}:${USER_GID} ./support/. ${SUPPORT}/
+RUN chown ${USERNAME} ${SUPPORT}
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -17,14 +23,10 @@ RUN apt-get update && apt-get upgrade -y && \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# environment
-ENV SUPPORT ${EPICS_ROOT}/support
 WORKDIR ${SUPPORT}
 
 # setup module.py for managing support module dependencies
-COPY --chown=${USER_UID}:${USER_GID} ./support/. ${SUPPORT}/
-RUN chown ${USERNAME} ${SUPPORT} && \
-    pip install -r requirements.txt
+RUN  pip install -r requirements.txt
 
 USER ${USERNAME}
 
@@ -52,6 +54,15 @@ RUN echo IOC=${EPICS_ROOT}/ioc >> configure/RELEASE && \
 COPY --chown=${USER_UID}:${USER_GID} ioc ${EPICS_ROOT}/ioc
 
 # compile the support modules and the IOC
-RUN cat /epics/support/seq-2-2-8/configure/RELEASE && \
+RUN cat ${SUPPORT}/seq-2-2-8/configure/RELEASE && \
     make && \
     make -j clean
+
+##### runtime stage ############################################################
+
+FROM ${REGISTRY}/epics-base:${EPICS_VERSION}.run AS runtime
+
+USER ${USERNAME}
+
+# get the products from the build stage
+COPY --from=developer ${EPICS_ROOT} ${EPICS_ROOT}
