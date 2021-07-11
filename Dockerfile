@@ -6,12 +6,8 @@ ARG EPICS_VERSION=7.0.5r3.0
 
 FROM ${REGISTRY}/epics-base:${EPICS_VERSION} AS developer
 
-# install additional tools
+# install additional packages
 USER root
-
-# import support folder root files
-COPY --chown=${USER_UID}:${USER_GID} ./support/. ${SUPPORT}/
-RUN chown ${USERNAME} ${SUPPORT}
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -22,6 +18,10 @@ RUN apt-get update && apt-get upgrade -y && \
     re2c \
     wget \
     && rm -rf /var/lib/apt/lists/*
+
+# import support folder root files
+COPY --chown=${USER_UID}:${USER_GID} ./support/. ${SUPPORT}/
+RUN chown ${USERNAME} ${SUPPORT}
 
 WORKDIR ${SUPPORT}
 
@@ -61,6 +61,16 @@ RUN cat ${SUPPORT}/seq-2-2-8/configure/RELEASE && \
 ##### runtime stage ############################################################
 
 FROM ${REGISTRY}/epics-base:${EPICS_VERSION}.run AS runtime
+
+# install runtime libraries from additional packages section above
+# also add busybox to aid debugging the runtime image
+USER root
+
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    busybox-static \
+    libusb-1.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 USER ${USERNAME}
 
