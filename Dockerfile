@@ -46,12 +46,12 @@ RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer
     python3 module.py add paulscherrerinstitute StreamDevice STREAM 2.8.16
 
 # patch support modules and fix up all dependencies
-RUN echo IOC=${EPICS_ROOT}/ioc >> configure/RELEASE && \
+RUN echo IOC=${IOC} >> configure/RELEASE && \
     ./patch_modules.sh && \
     python3 module.py dependencies
 
 # add the generic IOC source code
-COPY --chown=${USER_UID}:${USER_GID} ioc ${EPICS_ROOT}/ioc
+COPY --chown=${USER_UID}:${USER_GID} ioc ${IOC}
 
 # compile the support modules and the IOC
 RUN cat ${SUPPORT}/seq-2-2-8/configure/RELEASE && \
@@ -75,4 +75,5 @@ RUN apt-get update && apt-get upgrade -y && \
 USER ${USERNAME}
 
 # get the products from the build stage
-COPY --from=developer ${EPICS_ROOT} ${EPICS_ROOT}
+COPY --from=developer ${SUPPORT} ${SUPPORT}
+COPY --from=developer ${IOC} ${IOC}
