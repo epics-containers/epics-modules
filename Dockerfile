@@ -75,5 +75,5 @@ RUN apt-get update && apt-get upgrade -y && \
 USER ${USERNAME}
 
 # get the products from the build stage
-COPY --from=developer ${SUPPORT} ${SUPPORT}
-COPY --from=developer ${IOC} ${IOC}
+COPY --from=developer --chown=${USER_UID}:${USER_GID} ${SUPPORT} ${SUPPORT}
+COPY --from=developer --chown=${USER_UID}:${USER_GID} ${IOC} ${IOC}
