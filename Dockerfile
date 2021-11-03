@@ -33,7 +33,7 @@ RUN python3 module.py init
 
 # get basic support modules in order of dependencies
 RUN python3 module.py add-tar http://www-csr.bessy.de/control/SoftDist/sequencer/releases/seq-{TAG}.tar.gz seq SNCSEQ 2.2.8 && \
-    python3 module.py add epics-modules sscan SSCAN R2-11-4 && \
+    python3 module.py add epics-modules sscan SSCAN R2-11-5 && \
     python3 module.py add epics-modules calc CALC R3-7-4 && \
     python3 module.py add epics-modules asyn ASYN R4-41 && \
     python3 module.py add epics-modules alive ALIVE R1-3-1 && \
