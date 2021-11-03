@@ -58,7 +58,7 @@ RUN cat ${SUPPORT}/seq-2-2-8/configure/RELEASE && \
 
 ##### runtime stage ############################################################
 
-FROM ghcr.io/epics-containers/epics-base:7.0.6.1r1.0 AS runtime
+FROM ghcr.io/epics-containers/epics-base:7.0.6.1r1.0.run AS runtime
 
 # install runtime libraries from additional packages section above
 # also add busybox to aid debugging the runtime image
