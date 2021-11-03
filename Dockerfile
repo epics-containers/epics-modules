@@ -1,10 +1,8 @@
 # EPICS Dockerfile for Asyn and other fundamental support modules
-ARG REGISTRY=ghcr.io/epics-containers
-ARG EPICS_VERSION=7.0.5r3.0
 
 ##### build stage ##############################################################
 
-FROM ${REGISTRY}/epics-base:${EPICS_VERSION} AS developer
+FROM ghcr.io/epics-containers/epics-base:7.0.5r3.0 AS developer
 
 # install additional packages
 USER root
@@ -60,7 +58,7 @@ RUN cat ${SUPPORT}/seq-2-2-8/configure/RELEASE && \
 
 ##### runtime stage ############################################################
 
-FROM ${REGISTRY}/epics-base:${EPICS_VERSION}.run AS runtime
+FROM ghcr.io/epics-containers/epics-base:7.0.5r3.0.run AS runtime
 
 # install runtime libraries from additional packages section above
 # also add busybox to aid debugging the runtime image
