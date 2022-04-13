@@ -85,12 +85,8 @@ def add(
     if process.returncode != 0:
         raise RuntimeError(process.stdout)
 
-    # throw away git folder to keep image size tight
-    rmtree(Path(sub_folder) / ".git")
-
     with RELEASE.open("a") as stream:
         stream.write(f"{macro}=$(SUPPORT)/{module}-{dash_tag}\n")
-
 
 @cli.command()
 @click.argument("url")
