@@ -45,9 +45,8 @@ RUN echo IOC=${IOC} >> configure/RELEASE && \
     ./patch_modules.sh && \
     python3 module.py dependencies
 
-# add the generic IOC source code + allow the IOC to create its own files
+# add the generic IOC source code
 COPY ioc ${IOC}
-RUN chmod a+w -R ${IOC}
 
 # compile the support modules and the IOC
 RUN make && \
