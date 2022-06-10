@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=ibek.defs.schema.json
+# yaml-language-server: $schema=http://github.com/epics-containers/ibek/releases/download/0.9/ibek.defs.schema.json
 
 module: deviocstats
 
