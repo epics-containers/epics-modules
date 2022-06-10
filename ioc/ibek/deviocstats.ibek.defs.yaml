@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=ibek.defs.schema.json
+
+module: deviocstats
+
+defs:
+  - name: iocAdminSoft
+    args:
+      - type: str
+        name: IOC
+        description: Device Prefix for this IOC
+
+    databases:
+      - file: iocAdminSoft.db
+        include_args:
+          - IOC

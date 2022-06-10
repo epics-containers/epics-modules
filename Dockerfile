@@ -2,17 +2,15 @@
 
 ##### build stage ##############################################################
 
-ARG BASE=ghcr.io/epics-containers/epics-base:1.0.0
-
-FROM  ${BASE} AS developer
+# NOTE: update all FROM when changing epics-base version
+# This is not DRY but allows github dependabot to manage the versions
+FROM  ghcr.io/epics-containers/epics-base:1.1.0 AS developer
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     locales \
     libc-dev-bin \
     libusb-1.0-0-dev \
-    python3-pip \
-    python3.10-minimal \
     re2c \
     wget \
     && rm -rf /var/lib/apt/lists/*
@@ -21,9 +19,6 @@ RUN apt-get update && apt-get upgrade -y && \
 COPY ./support/. ${SUPPORT}/
 
 WORKDIR ${SUPPORT}
-
-# setup module.py for managing support module dependencies
-RUN  pip install -r requirements.txt
 
 # initialize the global support/configure/RELEASE
 RUN python3 module.py init
@@ -54,7 +49,7 @@ RUN make && \
 
 ##### runtime stage ############################################################
 
-FROM ${BASE}.run AS runtime
+FROM ghcr.io/epics-containers/epics-base:1.1.0.run AS runtime
 
 # install runtime libraries from additional packages section above
 # also add busybox to aid debugging the runtime image
