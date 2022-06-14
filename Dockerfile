@@ -49,7 +49,7 @@ RUN make && \
 
 ##### runtime stage ############################################################
 
-FROM ghcr.io/epics-containers/epics-base:1.1.2.run AS runtime
+FROM ghcr.io/epics-containers/epics-base-run:1.1.2 AS runtime
 
 # install runtime libraries from additional packages section above
 # also add busybox to aid debugging the runtime image
