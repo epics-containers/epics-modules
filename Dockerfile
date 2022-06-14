@@ -4,7 +4,7 @@
 
 # NOTE: update all FROM when changing epics-base version
 # This is not DRY but allows github dependabot to manage the versions
-FROM  ghcr.io/epics-containers/epics-base:1.1.2 AS developer
+FROM  ghcr.io/epics-containers/epics-base:1.2.0 AS developer
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
