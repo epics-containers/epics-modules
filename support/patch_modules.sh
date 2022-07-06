@@ -13,5 +13,6 @@ sed -i 's/#PROD_LIBS += sscan/PROD_LIBS += sscan/g'  StreamDevice*/streamApp/Mak
 sed -i s:'#SNCSEQ':'SNCSEQ':g calc*/configure/RELEASE
 
 # Enable TIRPC for ASYN
-sed -i s:'# TIRPC':'TIRPC':g asyn*/configure/CONFIG_SITE
+# TODO restore for ubuntu 22.04
+# sed -i s:'# TIRPC':'TIRPC':g asyn*/configure/CONFIG_SITE
 
