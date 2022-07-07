@@ -1,21 +1,14 @@
-# EPICS Dockerfile for Asyn and other fundamental support modules
-# This image also adds the minimal Generic IOC support
+# EPICS Dockerfile for adding Asyn and other fundamental support modules
+# Also adds the minimal Generic IOC support
 
 ##### build stage ##############################################################
+
 ARG TARGET_ARCHITECTURE=linux
 
-FROM  ghcr.io/epics-containers/epics-base-${TARGET_ARCHITECTURE}-developer:tests AS developer
+FROM  ghcr.io/epics-containers/epics-base-${TARGET_ARCHITECTURE}-developer:dev AS developer
 
 ARG TARGET_ARCHITECTURE
 ENV TARGET_ARCHITECTURE=${TARGET_ARCHITECTURE}
-ENV PYTHON_PKG ${EPICS_ROOT}/python
-# [TODO restore below for ubuntu 22.04]
-# ENV PYTHONPATH=${PYTHON_PKG}/local/lib/python3.10/dist-packages/ 
-# ENV PATH="${PYTHON_PKG}/local/bin:${PATH}"
-ENV PYTHONPATH=${PYTHON_PKG}/lib/python3.8/site-packages/
-ENV PATH="${PYTHON_PKG}/bin:${PATH}"
-ENV SUPPORT ${EPICS_ROOT}/support
-ENV IOC ${EPICS_ROOT}/ioc
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -30,8 +23,6 @@ RUN apt-get update && apt-get upgrade -y && \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-
-# import support folder root files
 COPY ./support/. ${SUPPORT}/
 RUN pip install --prefix=${PYTHON_PKG} -r ${SUPPORT}/requirements.txt
 
@@ -41,15 +32,16 @@ WORKDIR ${SUPPORT}
 COPY ioc ${IOC}
 
 # get standard support modules
-RUN ./get_source.sh
+RUN bash scripts/get_source.sh
 
 # compile the support modules and the IOC
 RUN make && \
-    make -j clean
+    make clean
+
 
 ##### runtime stage ############################################################
 
-FROM ghcr.io/epics-containers/epics-base-${TARGET_ARCHITECTURE}-runtime:tests AS runtime
+FROM ghcr.io/epics-containers/epics-base-${TARGET_ARCHITECTURE}-runtime:dev AS runtime
 
 
 RUN apt-get update && apt-get upgrade -y && \
@@ -60,6 +52,7 @@ RUN apt-get update && apt-get upgrade -y && \
     python3-minimal \
     && rm -rf /var/lib/apt/lists/*
 
+WORKDIR ${EPICS_ROOT}
 
 # get the products from the build stage
 COPY --from=developer ${PYTHON_PKG} ${PYTHON_PKG}

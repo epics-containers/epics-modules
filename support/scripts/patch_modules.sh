@@ -12,7 +12,5 @@ sed -i 's/#PROD_LIBS += sscan/PROD_LIBS += sscan/g'  StreamDevice*/streamApp/Mak
 # Uncomment sseq support in calc
 sed -i s:'#SNCSEQ':'SNCSEQ':g calc*/configure/RELEASE
 
-# Enable TIRPC for ASYN
-# TODO restore for ubuntu 22.04
-# sed -i s:'# TIRPC':'TIRPC':g asyn*/configure/CONFIG_SITE
-
+# Enable TIRPC for ASYN (not for RTEMS)
+echo "TIRPC=YES" >> asyn*/configure/CONFIG_SITE.Common.linux-x86_64

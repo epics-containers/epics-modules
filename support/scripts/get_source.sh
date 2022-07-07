@@ -23,9 +23,9 @@ if [[ ${TARGET_ARCHITECTURE} != "rtems" ]] ; then
 fi
 python3 module.py add epics-modules std STD R3-6-3
 
-cp ioc_Makefile_${TARGET_ARCHITECTURE} ../ioc/iocApp/src/Makefile
+cp scripts/ioc_Makefile_${TARGET_ARCHITECTURE} ../ioc/iocApp/src/Makefile
 
 # patch support modules and fix up all dependencies
 echo IOC=${IOC} >> configure/RELEASE 
-    ./patch_modules.sh 
+    bash scripts/patch_modules.sh 
     python3 module.py dependencies
