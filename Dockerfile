@@ -39,10 +39,15 @@ RUN make && \
     make clean
 
 
+##### runtime preparation stage ################################################
+
+FROM developer as runtime_prep
+
+RUN bash ${SUPPORT}/scripts/minimize.sh ${SUPPORT} /MIN_SUPPORT
+
 ##### runtime stage ############################################################
 
 FROM ghcr.io/epics-containers/epics-base-${TARGET_ARCHITECTURE}-runtime:dev AS runtime
-
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -56,5 +61,5 @@ WORKDIR ${EPICS_ROOT}
 
 # get the products from the build stage
 COPY --from=developer ${PYTHON_PKG} ${PYTHON_PKG}
-COPY --from=developer ${SUPPORT} ${SUPPORT}
+COPY --from=runtime_prep /MIN_SUPPORT ${SUPPORT}
 COPY --from=developer ${IOC} ${IOC}
