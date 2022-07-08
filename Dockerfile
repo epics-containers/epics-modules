@@ -43,7 +43,7 @@ RUN make && \
 
 FROM developer as runtime_prep
 
-RUN bash ${SUPPORT}/scripts/minimize.sh ${SUPPORT} /MIN_SUPPORT
+RUN bash ${EPICS_ROOT}/minimize.sh ${SUPPORT} /MIN_SUPPORT
 
 ##### runtime stage ############################################################
 
