@@ -16,3 +16,18 @@ index fa5be8e..ff56214 100644
  /* routines for NFS operation */
  int mountFileSystem(char *uidhost, char *addr, char *path, char *mntpoint);   /* mount the NFS */
  int dismountFileSystem(char *mntpoint);                           /* dismount the NFS */
+
+diff --git a/asApp/src/save_restore.c b/asApp/src/save_restore.c
+index 594c039..626f2d5 100644
+--- a/asApp/src/save_restore.c
++++ b/asApp/src/save_restore.c
+@@ -1939,6 +1939,9 @@ STATIC int write_it(char *filename, struct chlist *plist)
+ #else
+ 	n = fsync(fileno(out_fd));
+ 	if (n && (errno == ENOTSUP)) { n = 0; errno = 0; }
++#ifdef __rtems__
++	if (n && ((errno == EINVAL) || (errno == EROFS)) ) { n = 0; errno = 0; }
++#endif
+ 	if (n) {
+ 		printf("save_restore:write_it: fsync returned %d [%s]\n", n, datetime);
+ 		if (errno) myPrintErrno("write_it", __FILE__, __LINE__);

@@ -15,9 +15,9 @@ python3 module.py add epics-modules sscan SSCAN R2-11-5
 python3 module.py add epics-modules calc CALC R3-7-4 
 python3 module.py add epics-modules asyn ASYN R4-42 
 python3 module.py add epics-modules alive ALIVE R1-3-1 
+python3 module.py add epics-modules autosave AUTOSAVE R5-10-2 
+python3 module.py add epics-modules busy BUSY R1-7-3 
 if [[ ${TARGET_ARCHITECTURE} != "rtems" ]] ; then
-    python3 module.py add epics-modules autosave AUTOSAVE  R5-10-2 
-    python3 module.py add epics-modules busy BUSY R1-7-3 
     python3 module.py add epics-modules iocStats DEVIOCSTATS 3.1.16 
     python3 module.py add paulscherrerinstitute StreamDevice STREAM 2.8.22
 fi
